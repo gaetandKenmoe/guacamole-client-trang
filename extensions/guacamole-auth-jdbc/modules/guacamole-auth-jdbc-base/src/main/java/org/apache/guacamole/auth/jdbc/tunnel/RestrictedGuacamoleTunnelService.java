@@ -22,10 +22,15 @@ package org.apache.guacamole.auth.jdbc.tunnel;
 import com.google.common.collect.ConcurrentHashMultiset;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.sun.tools.javac.util.ArrayUtils;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.guacamole.GuacamoleClientDayTimeLimitException;
+import org.apache.guacamole.GuacamoleClientMonthTimeLimitException;
 import org.apache.guacamole.GuacamoleClientTooManyException;
 import org.apache.guacamole.auth.jdbc.connection.ModeledConnection;
 import org.apache.guacamole.GuacamoleException;
@@ -212,7 +217,11 @@ public class RestrictedGuacamoleTunnelService
         });
 
         // Track whether acquire fails due to user-specific limits
-        boolean userSpecificFailure = true;
+        // 0: max per user
+        // 1: overall max
+        // 2: day time limit
+        // 3: month time limit
+        int userSpecificFailure = 0;
 
         // Return the first unreserved connection
         for (ModeledConnection connection : sortedConnections) {
@@ -233,16 +242,30 @@ public class RestrictedGuacamoleTunnelService
             if (tryAdd(activeSeats, seat,
                     connection.getMaxConnectionsPerUser())) {
 
+                // Failure to acquire is not user-specific
+                userSpecificFailure = 1;
+                
                 // Attempt to aquire connection according to overall limits
                 if (tryAdd(activeConnections, connection.getIdentifier(),
-                        connection.getMaxConnections()))
-                    return connection;
+                        connection.getMaxConnections())) {
+                    
+                    // Failure to acquire is time limit
+                    userSpecificFailure = 2;
+                    long[] remaining_times = connection.getRemainingTimeLimit();
+                    long remaining_time = Arrays.stream(remaining_times).min().getAsLong();
+                    if (remaining_time > 0)
+                        return connection;
+                    else {
+                        if (remaining_times[1] == remaining_time)
+                            userSpecificFailure = 3;
+                    }
+                }
 
                 // Acquire failed - retry with next connection
-                activeSeats.remove(seat);
+                activeSeats.remove(seat);                
+                activeConnections.remove(connection.getIdentifier());
 
-                // Failure to acquire is not user-specific
-                userSpecificFailure = false;
+
 
             }
 
@@ -251,13 +274,20 @@ public class RestrictedGuacamoleTunnelService
         // Acquire failed
         totalActiveConnections.decrementAndGet();
 
-        // Too many connections by this user
-        if (userSpecificFailure)
-            throw new GuacamoleClientTooManyException("Cannot connect. Connection already in use by this user.");
-
-        // Too many connections, but not necessarily due purely to this user
-        else
-            throw new GuacamoleResourceConflictException("Cannot connect. This connection is in use.");
+        switch (userSpecificFailure) {
+            case 0:
+                // Too many connections by this user
+                    throw new GuacamoleClientTooManyException("Cannot connect. Connection already in use by this user.");
+            case 1:
+                // Too many connections, but not necessarily due purely to this user
+                throw new GuacamoleResourceConflictException("Cannot connect. This connection is in use.");
+            case 2:
+                // Day Time limit connection
+                throw new GuacamoleClientDayTimeLimitException("Cannot connect. You reach your day limit.");
+            default:
+                // Month Time limit connection
+                throw new GuacamoleClientMonthTimeLimitException("Cannot connect. You reach your month limit.");
+        }
 
     }
 

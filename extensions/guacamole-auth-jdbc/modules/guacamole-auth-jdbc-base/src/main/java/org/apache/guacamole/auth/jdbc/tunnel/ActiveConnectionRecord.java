@@ -373,12 +373,15 @@ public class ActiveConnectionRecord extends ModeledConnectionRecord {
      *
      * @param connectionID
      *     The connection ID assigned to this connection by guacd.
+     * 
+     * @param remaining_time
+     *     The time memaining of the tunnel
      *
      * @return
      *     The newly-created tunnel associated with this connection record.
      */
     public GuacamoleTunnel assignGuacamoleTunnel(final GuacamoleSocket socket,
-            String connectionID) {
+            String connectionID, long[] remaining_time) {
 
         // Create tunnel with given socket
         this.tunnel = new AbstractGuacamoleTunnel() {
@@ -393,8 +396,12 @@ public class ActiveConnectionRecord extends ModeledConnectionRecord {
                 return ActiveConnectionRecord.this.getUUID();
             }
 
+            @Override
+            public long[] getRemainingTime() {
+                return remaining_time;
+            }
         };
-
+        
         // Store connection ID of the primary connection only
         if (isPrimaryConnection())
             this.connectionID = connectionID;

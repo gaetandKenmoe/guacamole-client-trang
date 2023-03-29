@@ -33,6 +33,8 @@
         <result column="protocol"                 property="protocol"              jdbcType="VARCHAR"/>
         <result column="max_connections"          property="maxConnections"        jdbcType="INTEGER"/>
         <result column="max_connections_per_user" property="maxConnectionsPerUser" jdbcType="INTEGER"/>
+        <result column="day_limit"                property="dayLimit"              jdbcType="INTEGER"/>        
+        <result column="month_limit"              property="monthLimit"            jdbcType="INTEGER"/>
         <result column="proxy_hostname"           property="proxyHostname"         jdbcType="VARCHAR"/>
         <result column="proxy_port"               property="proxyPort"             jdbcType="INTEGER"/>
         <result column="proxy_encryption_method"  property="proxyEncryptionMethod" jdbcType="VARCHAR"
@@ -132,6 +134,8 @@
             protocol,
             max_connections,
             max_connections_per_user,
+            day_limit,
+            month_limit,
             proxy_hostname,
             proxy_port,
             proxy_encryption_method,
@@ -179,6 +183,8 @@
             protocol,
             max_connections,
             max_connections_per_user,
+            day_limit,
+            month_limit,
             proxy_hostname,
             proxy_port,
             proxy_encryption_method,
@@ -243,6 +249,8 @@
             protocol,
             max_connections,
             max_connections_per_user,
+            day_limit,
+            month_limit,
             proxy_hostname,
             proxy_port,
             proxy_encryption_method,
@@ -275,6 +283,8 @@
             protocol,
             max_connections,
             max_connections_per_user,
+            day_limit,
+            month_limit,
             proxy_hostname,
             proxy_port,
             proxy_encryption_method,
@@ -287,6 +297,8 @@
             #{object.protocol,jdbcType=VARCHAR},
             #{object.maxConnections,jdbcType=INTEGER},
             #{object.maxConnectionsPerUser,jdbcType=INTEGER},
+            #{object.dayLimit,jdbcType=INTEGER},
+            #{object.monthLimit,jdbcType=INTEGER},
             #{object.proxyHostname,jdbcType=VARCHAR},
             #{object.proxyPort,jdbcType=INTEGER},
             #{object.proxyEncryptionMethod,jdbcType=VARCHAR},
@@ -304,6 +316,8 @@
             protocol                 = #{object.protocol,jdbcType=VARCHAR},
             max_connections          = #{object.maxConnections,jdbcType=INTEGER},
             max_connections_per_user = #{object.maxConnectionsPerUser,jdbcType=INTEGER},
+            day_limit                = #{object.dayLimit,jdbcType=INTEGER},
+            month_limit              = #{object.monthLimit,jdbcType=INTEGER},
             proxy_hostname           = #{object.proxyHostname,jdbcType=VARCHAR},
             proxy_port               = #{object.proxyPort,jdbcType=INTEGER},
             proxy_encryption_method  = #{object.proxyEncryptionMethod,jdbcType=VARCHAR},

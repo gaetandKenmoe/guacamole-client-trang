@@ -70,6 +70,18 @@ public class ModeledConnectionGroup extends ModeledChildDirectoryObject<Connecti
      * they log out.
      */
     public static final String ENABLE_SESSION_AFFINITY = "enable-session-affinity";
+    
+    /**
+     * The name of the attribute which defines the time limit by 
+     * day a user can stay connected.
+     */
+    public static final String DAY_LIMIT = "day-limit";
+    
+    /**
+     * The name of the attribute which defines the time limit by 
+     * mont a user can stay connected.
+     */
+    public static final String MONTH_LIMIT = "month-limit";
 
     /**
      * All attributes related to restricting user accounts, within a logical
@@ -78,6 +90,8 @@ public class ModeledConnectionGroup extends ModeledChildDirectoryObject<Connecti
     public static final Form CONCURRENCY_LIMITS = new Form("concurrency", Arrays.<Field>asList(
         new NumericField(MAX_CONNECTIONS_NAME),
         new NumericField(MAX_CONNECTIONS_PER_USER_NAME),
+        new NumericField(DAY_LIMIT),
+        new NumericField(MONTH_LIMIT),
         new BooleanField(ENABLE_SESSION_AFFINITY, "true")
     ));
 
@@ -97,6 +111,8 @@ public class ModeledConnectionGroup extends ModeledChildDirectoryObject<Connecti
             Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
                 MAX_CONNECTIONS_NAME,
                 MAX_CONNECTIONS_PER_USER_NAME,
+                DAY_LIMIT,
+                MONTH_LIMIT,
                 ENABLE_SESSION_AFFINITY
             )));
 
@@ -184,6 +200,12 @@ public class ModeledConnectionGroup extends ModeledChildDirectoryObject<Connecti
         // Set per-user connection limit attribute
         attributes.put(MAX_CONNECTIONS_PER_USER_NAME, NumericField.format(getModel().getMaxConnectionsPerUser()));
 
+        // Set day limit attribute
+        attributes.put(DAY_LIMIT, NumericField.format(getModel().getDayLimit()));
+        
+        // Set month limit attribute
+        attributes.put(MONTH_LIMIT, NumericField.format(getModel().getMonthLimit()));
+        
         // Set session affinity attribute
         attributes.put(ENABLE_SESSION_AFFINITY,
                 getModel().isSessionAffinityEnabled() ? "true" : "");
@@ -208,6 +230,20 @@ public class ModeledConnectionGroup extends ModeledChildDirectoryObject<Connecti
         try { getModel().setMaxConnectionsPerUser(NumericField.parse(attributes.get(MAX_CONNECTIONS_PER_USER_NAME))); }
         catch (NumberFormatException e) {
             logger.warn("Not setting maximum connections per user: {}", e.getMessage());
+            logger.debug("Unable to parse numeric attribute.", e);
+        }
+
+        // Translate  connection limit attribute
+        try { getModel().setDayLimit(NumericField.parse(attributes.get(DAY_LIMIT))); }
+        catch (NumberFormatException e) {
+            logger.warn("Not setting daily limit: {}", e.getMessage());
+            logger.debug("Unable to parse numeric attribute.", e);
+        }
+        
+        // Translate per-user connection limit attribute
+        try { getModel().setMonthLimit(NumericField.parse(attributes.get(MONTH_LIMIT))); }
+        catch (NumberFormatException e) {
+            logger.warn("Not setting monthly limit: {}", e.getMessage());
             logger.debug("Unable to parse numeric attribute.", e);
         }
 
@@ -261,6 +297,50 @@ public class ModeledConnectionGroup extends ModeledChildDirectoryObject<Connecti
         Integer value = getModel().getMaxConnectionsPerUser();
         if (value == null)
             return environment.getDefaultMaxGroupConnectionsPerUser();
+
+        // Otherwise use defined value
+        return value;
+
+    }
+    
+    /**
+     * Returns the day time limit a user can connect 
+     * connection overall. If no limit applies, zero is returned.
+     *
+     * @return
+     *     The day limit connection.
+     *
+     * @throws GuacamoleException
+     *     If an error occurs while parsing the concurrency limit properties
+     *     specified within guacamole.properties.
+     */
+    public int getDayLimit() throws GuacamoleException {
+
+        Integer value = getModel().getDayLimit();
+        if (value == null)
+            return 0;
+
+        // Otherwise use defined value
+        return value;
+
+    }
+    
+    /**
+     * Returns the month time limit a user can connect 
+     * connection overall. If no limit applies, zero is returned.
+     *
+     * @return
+     *     The day limit connection.
+     *
+     * @throws GuacamoleException
+     *     If an error occurs while parsing the concurrency limit properties
+     *     specified within guacamole.properties.
+     */
+    public int getMonthLimit() throws GuacamoleException {
+
+        Integer value = getModel().getMonthLimit();
+        if (value == null)
+            return 0;
 
         // Otherwise use defined value
         return value;

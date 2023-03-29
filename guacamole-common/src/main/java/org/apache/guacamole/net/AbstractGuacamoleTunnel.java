@@ -51,7 +51,7 @@ public abstract class AbstractGuacamoleTunnel implements GuacamoleTunnel {
         readerLock = new ReentrantLock();
         writerLock = new ReentrantLock();
     }
-
+    
     /**
      * Acquires exclusive read access to the Guacamole instruction stream
      * and returns a GuacamoleReader for reading from that stream.
@@ -124,5 +124,5 @@ public abstract class AbstractGuacamoleTunnel implements GuacamoleTunnel {
     public boolean isOpen() {
         return getSocket().isOpen();
     }
-
+    
 }

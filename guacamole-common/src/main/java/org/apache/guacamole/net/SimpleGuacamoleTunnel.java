@@ -60,5 +60,10 @@ public class SimpleGuacamoleTunnel extends AbstractGuacamoleTunnel {
     public GuacamoleSocket getSocket() {
         return socket;
     }
-
+    
+    @Override
+    public long[] getRemainingTime() {
+        long[] remaining_times = {Long.MAX_VALUE, Long.MAX_VALUE};
+        return remaining_times;
+    }
 }

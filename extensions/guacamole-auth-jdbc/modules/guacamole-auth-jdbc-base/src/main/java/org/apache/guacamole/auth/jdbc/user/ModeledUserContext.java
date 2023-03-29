@@ -310,7 +310,6 @@ public class ModeledUserContext extends RestrictedObject
 
     }
 
-    @Override
     public boolean isValid() {
 
         try {

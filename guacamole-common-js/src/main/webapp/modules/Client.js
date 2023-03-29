@@ -1684,6 +1684,10 @@ Guacamole.Client = function(tunnel) {
 
         },
 
+        "time": function (parameters) {
+            document.getElementById("remaining-time").innerHTML = parameters[1];
+        },
+
         "transfer": function(parameters) {
 
             var srcL = getLayer(parseInt(parameters[0]));
@@ -1844,7 +1848,7 @@ Guacamole.Client = function(tunnel) {
             tunnel.sendMessage("disconnect");
             tunnel.disconnect();
             setState(Guacamole.Client.State.DISCONNECTED);
-
+            
         }
 
     };

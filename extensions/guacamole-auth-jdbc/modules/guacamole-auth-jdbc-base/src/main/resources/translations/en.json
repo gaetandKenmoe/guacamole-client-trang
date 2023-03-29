@@ -19,6 +19,8 @@
 
         "FIELD_HEADER_MAX_CONNECTIONS"          : "Maximum number of connections:",
         "FIELD_HEADER_MAX_CONNECTIONS_PER_USER" : "Maximum number of connections per user:",
+        "FIELD_HEADER_DAY_LIMIT"                : "Daily limit (Minutes):",
+        "FIELD_HEADER_MONTH_LIMIT"              : "Monthly limit (Minutes):",
 
         "FIELD_HEADER_FAILOVER_ONLY"            : "Use for failover only:",
         "FIELD_HEADER_WEIGHT"                   : "Connection weight:",
@@ -42,6 +44,8 @@
         "FIELD_HEADER_ENABLE_SESSION_AFFINITY"  : "Enable session affinity:",
         "FIELD_HEADER_MAX_CONNECTIONS"          : "Maximum number of connections:",
         "FIELD_HEADER_MAX_CONNECTIONS_PER_USER" : "Maximum number of connections per user:",
+        "FIELD_HEADER_DAY_LIMIT"                : "Daily limit (Minutes):",
+        "FIELD_HEADER_MONTH_LIMIT"              : "Monthly limit (Minutes):",
 
         "SECTION_HEADER_CONCURRENCY" : "Concurrency Limits (Balancing Groups)"
 

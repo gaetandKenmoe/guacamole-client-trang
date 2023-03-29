@@ -235,5 +235,60 @@
         LIMIT #{limit,jdbcType=INTEGER}
 
     </select>
+    <!-- Search for specific connection records for specific user-->
+    <select id="getUserConnection" resultMap="ConnectionRecordResultMap">
 
+        SELECT
+            guacamole_connection_history.history_id,
+            guacamole_connection_history.connection_id,
+            guacamole_connection_history.connection_name,
+            guacamole_connection_history.remote_host,
+            guacamole_connection_history.sharing_profile_id,
+            guacamole_connection_history.sharing_profile_name,
+            guacamole_connection_history.user_id,
+            guacamole_connection_history.username,
+            guacamole_connection_history.start_date,
+            guacamole_connection_history.end_date
+        FROM guacamole_connection_history
+
+        <!-- Search terms -->
+        <where>
+
+            AND guacamole_connection_history.connection_id = #{identifier,jdbcType=INTEGER}
+            AND guacamole_connection_history.user_id = #{user_id,jdbcType=INTEGER}
+        </where>
+
+        <!-- Bind sort property enum values for sake of readability -->
+        <bind name="START_DATE" value="@org.apache.guacamole.net.auth.ActivityRecordSet$SortableProperty@START_DATE"/>
+
+    </select>
+
+    <!-- Search for specific connection records for specific user-->
+    <select id="getUserGroupConnection" resultMap="ConnectionRecordResultMap">
+
+        SELECT
+            guacamole_connection_history.history_id,
+            guacamole_connection_history.connection_id,
+            guacamole_connection_history.connection_name,
+            guacamole_connection_history.remote_host,
+            guacamole_connection_history.sharing_profile_id,
+            guacamole_connection_history.sharing_profile_name,
+            guacamole_connection_history.user_id,
+            guacamole_connection_history.username,
+            guacamole_connection_history.start_date,
+            guacamole_connection_history.end_date
+        FROM guacamole_connection_history
+        JOIN guacamole_connection ON guacamole_connection.connection_id = guacamole_connection_history.connection_id
+
+        <!-- Search terms -->
+        <where>
+
+            AND guacamole_connection.parent_id = #{identifier,jdbcType=INTEGER}
+            AND guacamole_connection_history.user_id = #{user_id,jdbcType=INTEGER}
+        </where>
+
+        <!-- Bind sort property enum values for sake of readability -->
+        <bind name="START_DATE" value="@org.apache.guacamole.net.auth.ActivityRecordSet$SortableProperty@START_DATE"/>
+
+    </select>
 </mapper>

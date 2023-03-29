@@ -54,6 +54,16 @@ public class ConnectionModel extends ChildObjectModel {
      * or null if the default restrictions should be applied.
      */
     private Integer maxConnectionsPerUser;
+    
+    /**
+     * The Day Limit.
+     */
+    private Integer dayLimit;
+    
+    /**
+     * The Month limit.
+     */
+    private Integer monthLimit;
 
     /**
      * The weight of the connection for the purposes of calculating
@@ -183,6 +193,22 @@ public class ConnectionModel extends ChildObjectModel {
      */
     public Integer getMaxConnectionsPerUser() {
         return maxConnectionsPerUser;
+    }
+
+    public Integer getDayLimit() {
+        return dayLimit;
+    }
+
+    public void setDayLimit(Integer dayLimit) {
+        this.dayLimit = dayLimit;
+    }
+
+    public Integer getMonthLimit() {
+        return monthLimit;
+    }
+
+    public void setMonthLimit(Integer monthLimit) {
+        this.monthLimit = monthLimit;
     }
 
     /**

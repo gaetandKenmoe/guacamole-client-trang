@@ -119,6 +119,8 @@ CREATE TABLE [guacamole_connection_group] (
     -- Concurrency limits
     [max_connections]          [int],
     [max_connections_per_user] [int],
+    [day_limit]                [int],
+    [month_limit]              [int],
     [enable_session_affinity]  [bit] NOT NULL DEFAULT 0,
 
     CONSTRAINT [PK_guacamole_connection_group]
@@ -153,6 +155,8 @@ CREATE TABLE [guacamole_connection] (
     -- Concurrency limits
     [max_connections]          [int],
     [max_connections_per_user] [int],
+    [day_limit]                [int],
+    [month_limit]              [int],
 
     -- Connection Weight
     [connection_weight] [int],

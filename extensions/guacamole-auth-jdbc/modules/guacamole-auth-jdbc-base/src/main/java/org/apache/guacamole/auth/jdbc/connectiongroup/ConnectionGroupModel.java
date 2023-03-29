@@ -53,6 +53,16 @@ public class ConnectionGroupModel extends ChildObjectModel {
      * applies, or null if the default restrictions should be applied.
      */
     private Integer maxConnectionsPerUser;
+    
+    /**
+     * The Day Limit.
+     */
+    private Integer dayLimit;
+    
+    /**
+     * The Month limit.
+     */
+    private Integer monthLimit;
 
     /**
      * Whether individual users should be consistently assigned the same
@@ -172,6 +182,22 @@ public class ConnectionGroupModel extends ChildObjectModel {
      */
     public void setMaxConnectionsPerUser(Integer maxConnectionsPerUser) {
         this.maxConnectionsPerUser = maxConnectionsPerUser;
+    }
+
+    public Integer getDayLimit() {
+        return dayLimit;
+    }
+
+    public void setDayLimit(Integer dayLimit) {
+        this.dayLimit = dayLimit;
+    }
+
+    public Integer getMonthLimit() {
+        return monthLimit;
+    }
+
+    public void setMonthLimit(Integer monthLimit) {
+        this.monthLimit = monthLimit;
     }
 
     /**

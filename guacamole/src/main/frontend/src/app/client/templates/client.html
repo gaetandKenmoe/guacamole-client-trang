@@ -45,6 +45,11 @@
         {{'CLIENT.TEXT_CLIENT_STATUS_UNSTABLE' | translate}}
     </div>
     
+    <!-- Remaining time -->
+    <div id="remaining-time" ng-show="isConnected()">
+        
+    </div>
+    
     <!-- Menu -->
     <div class="menu" ng-class="{open: menu.shown}" id="guac-menu">
         <div class="menu-content" ng-if="menu.shown" guac-touch-drag="menuDrag">

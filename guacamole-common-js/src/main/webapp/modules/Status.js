@@ -233,7 +233,21 @@ Guacamole.Status.Code = {
      *
      * @type {!number}
      */
-    "CLIENT_TOO_MANY": 0x031D
+    "CLIENT_TOO_MANY": 0x031D,
+
+    /**
+     * The operation failed because the current client reach his day time limit.
+     *
+     * @type {!number}
+     */
+    "CLIENT_DAY_TIME_LIMIT": 0x015A,
+
+    /**
+     * The operation failed because the current client reach his month time limit.
+     *
+     * @type {!number}
+     */
+    "CLIENT_MONTH_TIME_LIMIT": 0x015B
 
 };
 
@@ -269,6 +283,14 @@ Guacamole.Status.Code.fromHTTPCode = function fromHTTPCode(status) {
         // HTTP 429 - Too many requests
         case 429:
             return Guacamole.Status.Code.CLIENT_TOO_MANY;
+
+        // HTTP 430 - connection day time limit
+        case 430:
+            return Guacamole.Status.Code.CLIENT_DAY_TIME_LIMIT;
+
+        // HTTP 431 - connection month time limit
+        case 431:
+            return Guacamole.Status.Code.CLIENT_MONTH_TIME_LIMIT;
 
         // HTTP 503 - Server unavailable
         case 503:

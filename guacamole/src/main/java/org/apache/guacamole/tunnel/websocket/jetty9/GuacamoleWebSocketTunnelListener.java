@@ -74,7 +74,7 @@ public abstract class GuacamoleWebSocketTunnelListener implements WebSocketListe
      * non-null if tunnel is non-null.
      */
     private RemoteEndpoint remote;
-
+    
     /**
      * Sends the given numeric Guacamole and WebSocket status
      * codes on the given WebSocket connection and closes the
@@ -193,7 +193,7 @@ public abstract class GuacamoleWebSocketTunnelListener implements WebSocketListe
                 closeConnection(session, GuacamoleStatus.RESOURCE_NOT_FOUND);
                 return;
             }
-
+            
         }
         catch (GuacamoleException e) {
             logger.error("Creation of WebSocket tunnel to guacd failed: {}", e.getMessage());
@@ -201,7 +201,7 @@ public abstract class GuacamoleWebSocketTunnelListener implements WebSocketListe
             closeConnection(session, e.getStatus().getGuacamoleStatusCode(), e.getWebSocketCode());
             return;
         }
-
+        
         // Prepare read transfer thread
         Thread readThread = new Thread() {
 
@@ -274,7 +274,7 @@ public abstract class GuacamoleWebSocketTunnelListener implements WebSocketListe
         readThread.start();
 
     }
-
+    
     @Override
     public void onWebSocketText(String message) {
 

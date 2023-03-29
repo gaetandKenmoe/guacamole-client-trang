@@ -105,6 +105,13 @@ public interface GuacamoleTunnel {
      * @return The GuacamoleSocket used by this GuacamoleTunnel.
      */
     GuacamoleSocket getSocket();
+    
+    /**
+     * Returns the remaining time of the tunnel.
+     *
+     * @return the remaining time.
+     */
+    long[] getRemainingTime();
 
     /**
      * Release all resources allocated to this GuacamoleTunnel.

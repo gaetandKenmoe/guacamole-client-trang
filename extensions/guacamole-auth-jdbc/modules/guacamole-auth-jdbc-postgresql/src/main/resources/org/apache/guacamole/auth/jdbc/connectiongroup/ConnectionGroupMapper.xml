@@ -34,6 +34,8 @@
                 javaType="org.apache.guacamole.net.auth.ConnectionGroup$Type"/>
         <result column="max_connections"          property="maxConnections"         jdbcType="INTEGER"/>
         <result column="max_connections_per_user" property="maxConnectionsPerUser"  jdbcType="INTEGER"/>
+        <result column="day_limit"                property="dayLimit"               jdbcType="INTEGER"/>
+        <result column="month_limit"              property="monthLimit"             jdbcType="INTEGER"/>
         <result column="enable_session_affinity"  property="sessionAffinityEnabled" jdbcType="BOOLEAN"/>
 
         <!-- Child connection groups -->
@@ -133,6 +135,8 @@
             type,
             max_connections,
             max_connections_per_user,
+            day_limit,
+            month_limit,
             enable_session_affinity
         FROM guacamole_connection_group
         WHERE connection_group_id IN
@@ -181,6 +185,8 @@
             type,
             max_connections,
             max_connections_per_user,
+            day_limit,
+            month_limit,
             enable_session_affinity
         FROM guacamole_connection_group
         WHERE guacamole_connection_group.connection_group_id IN
@@ -252,6 +258,8 @@
             type,
             max_connections,
             max_connections_per_user,
+            day_limit,
+            month_limit,
             enable_session_affinity
         FROM guacamole_connection_group
         WHERE 
@@ -277,6 +285,8 @@
             type,
             max_connections,
             max_connections_per_user,
+            day_limit,
+            month_limit,
             enable_session_affinity
         )
         VALUES (
@@ -285,6 +295,8 @@
             #{object.type,jdbcType=VARCHAR}::guacamole_connection_group_type,
             #{object.maxConnections,jdbcType=INTEGER},
             #{object.maxConnectionsPerUser,jdbcType=INTEGER},
+            #{object.dayLimit,jdbcType=INTEGER},
+            #{object.monthLimit,jdbcType=INTEGER},
             #{object.sessionAffinityEnabled,jdbcType=BOOLEAN}
         )
 
@@ -298,6 +310,8 @@
             type                     = #{object.type,jdbcType=VARCHAR}::guacamole_connection_group_type,
             max_connections          = #{object.maxConnections,jdbcType=INTEGER},
             max_connections_per_user = #{object.maxConnectionsPerUser,jdbcType=INTEGER},
+            day_limit                = #{object.dayLimit,jdbcType=INTEGER},
+            month_limit              = #{object.monthLimit,jdbcType=INTEGER},
             enable_session_affinity  = #{object.sessionAffinityEnabled,jdbcType=BOOLEAN}
         WHERE connection_group_id = #{object.objectID,jdbcType=INTEGER}::integer
     </update>

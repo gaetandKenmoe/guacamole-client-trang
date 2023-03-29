@@ -19,9 +19,32 @@
 
 package org.apache.guacamole.auth.jdbc.connection;
 
+import java.util.List;
 import org.apache.guacamole.auth.jdbc.base.ActivityRecordMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Mapper for connection record objects.
  */
-public interface ConnectionRecordMapper extends ActivityRecordMapper<ConnectionRecordModel> {}
+public interface ConnectionRecordMapper extends ActivityRecordMapper<ConnectionRecordModel> {
+
+    /**
+     * @param identifier
+     *  the identifier of the connection
+     * @param user_id
+     * @return 
+     *
+     */
+    List<ConnectionRecordModel> getUserConnection(@Param("identifier") Integer identifier,
+            @Param("user_id") Integer user_id);
+    
+        /**
+     * @param identifier
+     *  the identifier of the connection group
+     * @param user_id
+     * @return 
+     *
+     */
+    List<ConnectionRecordModel> getUserGroupConnection(@Param("identifier") String identifier,
+            @Param("user_id") Integer user_id);
+}

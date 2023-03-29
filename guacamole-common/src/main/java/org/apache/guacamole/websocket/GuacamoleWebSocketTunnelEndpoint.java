@@ -20,7 +20,12 @@
 package org.apache.guacamole.websocket;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.Endpoint;
@@ -41,6 +46,8 @@ import org.apache.guacamole.protocol.FilteredGuacamoleWriter;
 import org.apache.guacamole.protocol.GuacamoleFilter;
 import org.apache.guacamole.protocol.GuacamoleInstruction;
 import org.apache.guacamole.protocol.GuacamoleStatus;
+import org.apache.guacamole.timer.GuacamoleConnectionTimeTask;
+import org.apache.guacamole.timer.GuacamoleTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +92,12 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
     private RemoteEndpoint.Basic remote;
 
     /**
+     * Remote (client) side of this connection. This value will always be
+     * non-null if tunnel is non-null.
+     */
+    private GuacamoleConnectionTimeTask connectionTimeTask;
+
+    /**
      * Sends the numeric Guacaomle Status Code and Web Socket
      * code and closes the connection.
      *
@@ -104,6 +117,7 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
             CloseCode code = CloseReason.CloseCodes.getCloseCode(webSocketCode);
             String message = Integer.toString(guacamoleStatusCode);
             session.close(new CloseReason(code, message));
+            connectionTimeTask.cancel();
         }
         catch (IOException e) {
             logger.debug("Unable to close WebSocket connection.", e);
@@ -187,6 +201,55 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
     protected abstract GuacamoleTunnel createTunnel(Session session, EndpointConfig config)
             throws GuacamoleException;
 
+    private boolean runThread(long[] remaining_times) {
+        String message = "";
+        long remaining_time;
+        remaining_time = Arrays.stream(remaining_times).min().getAsLong();
+        
+        if (remaining_time <= 0) {
+            try {
+                if (remaining_times[0] == remaining_time)
+                    message = "5.error,5.close,6.0x015A;";
+                else
+                    message = "5.error,5.close,6.0x015B;";
+                sendInstruction(message);
+            } catch (IOException ex) {
+                logger.info(ex.getMessage());
+            }
+        } else {
+            remaining_times[0] -= 1000;
+            remaining_times[1] -= 1000;
+            message = "4.time," + tunnel.getUUID().toString().length() + "." + tunnel.getUUID();
+            String time = "";
+            if (remaining_times[0] <= (GuacamoleTime.SECS_DAY * 1000)) {
+                String dayRemainingTime = GuacamoleTime.formatToHour(remaining_times[0]);
+                time += "Daily Time Left: " + dayRemainingTime;
+            }
+            
+            if (remaining_times[1] <= (GuacamoleTime.SECS_MONTH * 1000)) {
+                String monthRemainingTime = GuacamoleTime.formatToHour(remaining_times[1]);
+                time += "".equals(time) ? "" : " - ";
+                time += "Monthly Time Left: " + monthRemainingTime;
+            }
+            
+            if ("".equals(time)) {
+                message += ",9.Unlimited";
+            } else {
+                message += "," + time.length() + "." + time;
+            }
+            
+            message += ";";
+            
+        }
+        try {
+            sendInstruction(message);
+        } catch (IOException ex) {
+            logger.info(ex.getMessage());
+        }
+        
+        return remaining_time > 0;
+    }
+
     @Override
     @OnOpen
     public void onOpen(final Session session, EndpointConfig config) {
@@ -203,6 +266,9 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
                 return;
             }
 
+            //connectionTimeTask = new GuacamoleConnectionTimeTask(remote, tunnel);
+            //Timer timer = new Timer(true);
+            //timer.scheduleAtFixedRate(connectionTimeTask, 1000, 1000);
         }
         catch (GuacamoleException e) {
             logger.error("Creation of WebSocket tunnel to guacd failed: {}", e.getMessage());
@@ -244,7 +310,7 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
 
                         // Attempt to read
                         while ((readMessage = reader.read()) != null) {
-
+                            
                             // Buffer message
                             buffer.append(readMessage);
 
@@ -292,6 +358,40 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
         };
 
         readThread.start();
+
+        // Prepare remainig time thread
+        Thread remainingTimeThread = new Thread() {
+
+            @Override
+            public void run() {
+                
+                long[] remaining_times = tunnel.getRemainingTime();
+                // Attempt to read
+                while (true) {
+                    try {
+//                        if (remaining_times[0] == Long.MAX_VALUE && remaining_times[1] == Long.MAX_VALUE) {
+//                            try {
+//                                String message = "4.time," + tunnel.getUUID().toString().length() + "." + tunnel.getUUID() + ",9.Unlimited";
+//                                sendInstruction(message);
+//                            } catch (IOException ex) {
+//                                logger.info(ex.getMessage());
+//                            }
+//                            break;
+//                        }
+                        if (!runThread(remaining_times))
+                            break;
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        java.util.logging.Logger.getLogger(GuacamoleWebSocketTunnelEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
+
+            }
+
+        };
+
+        remainingTimeThread.start();
 
     }
 

@@ -21,6 +21,9 @@ package org.apache.guacamole.auth.jdbc.connection;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +36,11 @@ import org.apache.guacamole.auth.jdbc.tunnel.GuacamoleTunnelService;
 import org.apache.guacamole.GuacamoleException;
 import org.apache.guacamole.auth.jdbc.JDBCEnvironment;
 import org.apache.guacamole.auth.jdbc.base.ModeledChildDirectoryObject;
+import org.apache.guacamole.auth.jdbc.connectiongroup.ConnectionGroupMapper;
+import org.apache.guacamole.auth.jdbc.connectiongroup.ConnectionGroupModel;
+import org.apache.guacamole.auth.jdbc.connectiongroup.ModeledConnectionGroup;
+import org.apache.guacamole.auth.jdbc.user.ModeledAuthenticatedUser;
+import org.apache.guacamole.environment.Environment;
 import org.apache.guacamole.form.BooleanField;
 import org.apache.guacamole.form.EnumField;
 import org.apache.guacamole.form.Field;
@@ -56,7 +64,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ModeledConnection extends ModeledChildDirectoryObject<ConnectionModel>
     implements Connection {
-
+    
     /**
      * Logger for this class.
      */
@@ -118,6 +126,18 @@ public class ModeledConnection extends ModeledChildDirectoryObject<ConnectionMod
      * concurrent connections per user.
      */
     public static final String MAX_CONNECTIONS_PER_USER_NAME = "max-connections-per-user";
+    
+    /**
+     * The name of the attribute which defines the time limit by 
+     * day a user can stay connected.
+     */
+    public static final String DAY_LIMIT_ATTRIBUTE_NAME = "day-limit";
+    
+    /**
+     * The name of the attribute which defines the time limit by 
+     * mont a user can stay connected.
+     */
+    public static final String MONTH_LIMIT_ATTRIBUTE_NAME = "month-limit";
 
     /**
      * The connection weight attribute used for weighted load balancing algorithms.
@@ -137,7 +157,9 @@ public class ModeledConnection extends ModeledChildDirectoryObject<ConnectionMod
      */
     public static final Form CONCURRENCY_LIMITS = new Form("concurrency", Arrays.<Field>asList(
         new NumericField(MAX_CONNECTIONS_NAME),
-        new NumericField(MAX_CONNECTIONS_PER_USER_NAME)
+        new NumericField(MAX_CONNECTIONS_PER_USER_NAME),
+        new NumericField(DAY_LIMIT_ATTRIBUTE_NAME),
+        new NumericField(MONTH_LIMIT_ATTRIBUTE_NAME)
     ));
 
     /**
@@ -169,6 +191,8 @@ public class ModeledConnection extends ModeledChildDirectoryObject<ConnectionMod
                 GUACD_ENCRYPTION_NAME,
                 MAX_CONNECTIONS_NAME,
                 MAX_CONNECTIONS_PER_USER_NAME,
+                DAY_LIMIT_ATTRIBUTE_NAME,
+                MONTH_LIMIT_ATTRIBUTE_NAME,
                 CONNECTION_WEIGHT,
                 FAILOVER_ONLY_NAME
             )));
@@ -203,6 +227,17 @@ public class ModeledConnection extends ModeledChildDirectoryObject<ConnectionMod
     @Inject
     private Provider<ConnectionRecordSet> connectionRecordSetProvider;
     
+    /**
+     * Mapper for accessing connection history.
+     */
+    @Inject
+    private ConnectionRecordMapper connectionRecordMapper;
+    
+    /**
+     * Mapper for accessing connection group.
+     */
+    @Inject
+    private ConnectionGroupMapper connectionGroupMapper;
     /**
      * The manually-set GuacamoleConfiguration, if any.
      */
@@ -296,6 +331,12 @@ public class ModeledConnection extends ModeledChildDirectoryObject<ConnectionMod
         // Set per-user connection limit attribute
         attributes.put(MAX_CONNECTIONS_PER_USER_NAME, NumericField.format(getModel().getMaxConnectionsPerUser()));
 
+        // Set day limit attribute
+        attributes.put(DAY_LIMIT_ATTRIBUTE_NAME, NumericField.format(getModel().getDayLimit()));
+        
+        // Set month limit attribute
+        attributes.put(MONTH_LIMIT_ATTRIBUTE_NAME, NumericField.format(getModel().getMonthLimit()));
+        
         // Set guacd (proxy) hostname and port
         attributes.put(GUACD_HOSTNAME_NAME, getModel().getProxyHostname());
         attributes.put(GUACD_PORT_NAME, NumericField.format(getModel().getProxyPort()));
@@ -351,6 +392,20 @@ public class ModeledConnection extends ModeledChildDirectoryObject<ConnectionMod
         try { getModel().setMaxConnectionsPerUser(NumericField.parse(attributes.get(MAX_CONNECTIONS_PER_USER_NAME))); }
         catch (NumberFormatException e) {
             logger.warn("Not setting maximum connections per user: {}", e.getMessage());
+            logger.debug("Unable to parse numeric attribute.", e);
+        }
+
+        // Translate per-user connection limit attribute
+        try { getModel().setDayLimit(NumericField.parse(attributes.get(DAY_LIMIT_ATTRIBUTE_NAME))); }
+        catch (NumberFormatException e) {
+            logger.warn("Not setting daily limit per user: {}", e.getMessage());
+            logger.debug("Unable to parse numeric attribute.", e);
+        }
+        
+        // Translate per-user connection limit attribute
+        try { getModel().setMonthLimit(NumericField.parse(attributes.get(MONTH_LIMIT_ATTRIBUTE_NAME))); }
+        catch (NumberFormatException e) {
+            logger.warn("Not setting monthly limit per user: {}", e.getMessage());
             logger.debug("Unable to parse numeric attribute.", e);
         }
 
@@ -439,6 +494,52 @@ public class ModeledConnection extends ModeledChildDirectoryObject<ConnectionMod
         return value;
 
     }
+    
+    /**
+     * Returns the day time limit a user can connect 
+     * connection overall. If no limit applies, zero is returned.
+     *
+     * @return
+     *     The day limit connection.
+     *
+     * @throws GuacamoleException
+     *     If an error occurs while parsing the concurrency limit properties
+     *     specified within guacamole.properties.
+     */
+    public int getDayLimit() throws GuacamoleException {
+
+        // Pull default from environment if connection limit is unset
+        Integer value = getModel().getDayLimit();
+        if (value == null)
+            return 0;
+
+        // Otherwise use defined value
+        return value;
+
+    }
+    
+    /**
+     * Returns the month time limit a user can connect 
+     * connection overall. If no limit applies, zero is returned.
+     *
+     * @return
+     *     The day limit connection.
+     *
+     * @throws GuacamoleException
+     *     If an error occurs while parsing the concurrency limit properties
+     *     specified within guacamole.properties.
+     */
+    public int getMonthLimit() throws GuacamoleException {
+
+        // Pull default from environment if connection limit is unset
+        Integer value = getModel().getMonthLimit();
+        if (value == null)
+            return 0;
+
+        // Otherwise use defined value
+        return value;
+
+    }
 
     /**
      * Returns the connection information which should be used to connect to
@@ -503,6 +604,89 @@ public class ModeledConnection extends ModeledChildDirectoryObject<ConnectionMod
      */
     public boolean isFailoverOnly() {
         return getModel().isFailoverOnly();
+    }
+    
+    public ModeledConnectionGroup getConnectionGroup() {
+        Collection<String> identifiers = new ArrayList<String>(1);
+        identifiers.add(getParentIdentifier());
+        Collection<ConnectionGroupModel> connectionGroups;
+        connectionGroups = connectionGroupMapper.select(identifiers);
+        for (ConnectionGroupModel connectionGroup : connectionGroups) {
+            ModeledConnectionGroup modeledConnectionGroup = new ModeledConnectionGroup();
+            modeledConnectionGroup.init(getCurrentUser(), connectionGroup);
+            return modeledConnectionGroup;
+        }
+        return null;
+    }
+    
+    private int getpassTime(LocalDate dateBegin, boolean is_group) {
+        ModeledAuthenticatedUser user;
+        user = getCurrentUser();
+        List<ConnectionRecordModel> connectionRecords;
+        if (is_group) {
+            connectionRecords = connectionRecordMapper.getUserGroupConnection(getParentIdentifier(),
+                    user.getUser().getModel().getObjectID());
+        } else {
+            connectionRecords = connectionRecordMapper.getUserConnection(getModel().getObjectID(), 
+                    user.getUser().getModel().getObjectID());
+        }
+        int past_time = 0;
+        Date endDate = null;
+        for (ConnectionRecordModel connectionRecord : connectionRecords) {
+            if (dateBegin.compareTo(connectionRecord.getStartDate().toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDate()) <= 0) {
+                endDate = connectionRecord.getEndDate() == null ? new Date() : connectionRecord.getEndDate();
+                past_time += endDate.getTime() - connectionRecord.getStartDate().getTime();
+            }
+        }
+        return past_time;
+    }
+    
+    private long getRemainingMonthlyTime() throws GuacamoleException {
+        
+        
+        int month_limit = getMonthLimit() * 60000;
+        boolean is_group = false;
+        if (month_limit == 0) {
+            ModeledConnectionGroup modeledConnectionGroup = getConnectionGroup();
+            month_limit = modeledConnectionGroup.getMonthLimit() * 60000;
+            is_group = true;
+        }
+        
+        LocalDate startDate = LocalDate.now().withDayOfMonth(1);
+        int past_time = getpassTime(startDate, is_group);
+        if (month_limit > 0)
+            return month_limit - past_time;
+        return Long.MAX_VALUE;
+    }
+    
+    private long getRemainingDailyTime() throws GuacamoleException {
+        
+        int day_limit = getDayLimit() * 60000;
+        boolean is_group = false;
+        if (day_limit == 0) {
+            ModeledConnectionGroup modeledConnectionGroup = getConnectionGroup();
+            day_limit = modeledConnectionGroup.getDayLimit() * 60000;
+            is_group = true;
+        }
+        
+        LocalDate startDate = LocalDate.now();
+        int past_time = getpassTime(startDate, is_group);
+        if (day_limit > 0)
+            return day_limit - past_time;
+        return Long.MAX_VALUE;
+    }
+    
+    public long[] getRemainingTimeLimit() throws GuacamoleException {
+        
+        if (getCurrentUser().getUser().isPrivileged()) {
+            long[] remaining_time = {Long.MAX_VALUE, Long.MAX_VALUE};
+            return remaining_time;
+        }
+        long day_remaining = getRemainingDailyTime();
+        long month_remaining = getRemainingMonthlyTime();
+        long[] remaining_time = {day_remaining, month_remaining};
+        return remaining_time;
     }
 
 }

@@ -636,6 +636,20 @@ angular.module('client').controller('clientController', ['$scope', '$routeParams
     $scope.isConnectionUnstable = function isConnectionUnstable() {
         return _.findIndex($scope.clientGroup.clients, client => client.clientState.tunnelUnstable) !== -1;
     };
+    
+    /**
+     * Returns whether the current connection has been flagged as unstable due
+     * to an apparent network disruption.
+     *
+     * @returns {Boolean}
+     *     true if the current connection has been flagged as unstable, false
+     *     otherwise.
+     */
+    $scope.isConnected = function isConnected() {
+        return _.findIndex($scope.clientGroup.clients, 
+            client => client.clientState.connectionState === ManagedClientState.ConnectionState.CONNECTED) !== -1;
+    };
+    
 
     /**
      * Immediately disconnects all currently-focused clients, if any.

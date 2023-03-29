@@ -95,5 +95,10 @@ public class DelegatingGuacamoleTunnel implements GuacamoleTunnel {
     public boolean isOpen() {
         return tunnel.isOpen();
     }
-
+    
+    @Override
+    public long[] getRemainingTime() {
+        return tunnel.getRemainingTime();
+    }
+    
 }

@@ -88,6 +88,8 @@
         "ERROR_CLIENT_303"     : "The remote desktop server has denied access to this connection. If you require access, please ask your system administrator to grant your account access, or check your system settings.",
         "ERROR_CLIENT_308"     : "The Guacamole server has closed the connection because there has been no response from your browser for long enough that it appeared to be disconnected. This is commonly caused by network problems, such as spotty wireless signal, or simply very slow network speeds. Please check your network and try again.",
         "ERROR_CLIENT_31D"     : "The Guacamole server is denying access to this connection because you have exhausted the limit for simultaneous connection use by an individual user. Please close one or more connections and try again.",
+        "ERROR_CLIENT_15A"     : "You have exhausted your time limit in one day.",
+        "ERROR_CLIENT_15B"     : "You have exhausted your time limit in one month.",
         "ERROR_CLIENT_DEFAULT" : "An internal error has occurred within the Guacamole server, and the connection has been terminated. If the problem persists, please notify your system administrator, or check your system logs.",
 
         "ERROR_TUNNEL_201"     : "The Guacamole server has rejected this connection attempt because there are too many active connections. Please wait a few minutes and try again.",
@@ -101,6 +103,8 @@
         "ERROR_TUNNEL_303"     : "You do not have permission to access this connection. If you require access, please ask your system administrator to add you the list of allowed users, or check your system settings.",
         "ERROR_TUNNEL_308"     : "The Guacamole server has closed the connection because there has been no response from your browser for long enough that it appeared to be disconnected. This is commonly caused by network problems, such as spotty wireless signal, or simply very slow network speeds. Please check your network and try again.",
         "ERROR_TUNNEL_31D"     : "The Guacamole server is denying access to this connection because you have exhausted the limit for simultaneous connection use by an individual user. Please close one or more connections and try again.",
+        "ERROR_TUNNEL_15A"     : "You have exhausted your time limit in one day.",
+        "ERROR_TUNNEL_15B"     : "You have exhausted your time limit in one month.",
         "ERROR_TUNNEL_DEFAULT" : "An internal error has occurred within the Guacamole server, and the connection has been terminated. If the problem persists, please notify your system administrator, or check your system logs.",
 
         "ERROR_UPLOAD_100"     : "File transfer is either not supported or not enabled. Please contact your system administrator, or check your system logs.",

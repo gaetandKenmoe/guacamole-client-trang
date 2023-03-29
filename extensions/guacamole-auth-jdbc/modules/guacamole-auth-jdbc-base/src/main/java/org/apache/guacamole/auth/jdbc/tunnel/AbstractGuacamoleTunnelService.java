@@ -416,6 +416,8 @@ public abstract class AbstractGuacamoleTunnelService implements GuacamoleTunnelS
             GuacamoleClientInformation info, Map<String, String> tokens,
             boolean interceptErrors) throws GuacamoleException {
 
+        long[] remaining_time = activeConnection.getConnection().getRemainingTimeLimit();
+
         // Record new active connection
         Runnable cleanupTask = new ConnectionCleanupTask(activeConnection);
         try {
@@ -478,9 +480,9 @@ public abstract class AbstractGuacamoleTunnelService implements GuacamoleTunnelS
 
             // Assign and return new tunnel
             if (interceptErrors)
-                return activeConnection.assignGuacamoleTunnel(new FailoverGuacamoleSocket(socket), socket.getConnectionID());
+                return activeConnection.assignGuacamoleTunnel(new FailoverGuacamoleSocket(socket), socket.getConnectionID(), remaining_time);
             else
-                return activeConnection.assignGuacamoleTunnel(socket, socket.getConnectionID());
+                return activeConnection.assignGuacamoleTunnel(socket, socket.getConnectionID(), remaining_time);
             
         }
 

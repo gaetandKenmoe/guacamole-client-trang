@@ -20,7 +20,9 @@
 package org.apache.guacamole.protocol;
 
 import org.apache.guacamole.GuacamoleClientBadTypeException;
+import org.apache.guacamole.GuacamoleClientDayTimeLimitException;
 import org.apache.guacamole.GuacamoleClientException;
+import org.apache.guacamole.GuacamoleClientMonthTimeLimitException;
 import org.apache.guacamole.GuacamoleClientOverrunException;
 import org.apache.guacamole.GuacamoleClientTimeoutException;
 import org.apache.guacamole.GuacamoleClientTooManyException;
@@ -311,6 +313,30 @@ public enum GuacamoleStatus {
         @Override
         public GuacamoleException toException(String message) {
             return new GuacamoleClientTooManyException(message);
+        }
+
+    },
+
+    /**
+     * The operation failed because the current user reach his day time limit.
+     */
+    CLIENT_DAY_TIME_LIMIT(430, 1010, 0x015A) {
+
+        @Override
+        public GuacamoleException toException(String message) {
+            return new GuacamoleClientDayTimeLimitException(message);
+        }
+
+    },
+
+    /**
+     * The operation failed because the current user reach his month time limit.
+     */
+    CLIENT_MONTH_TIME_LIMIT(431, 1011, 0x015B) {
+
+        @Override
+        public GuacamoleException toException(String message) {
+            return new GuacamoleClientMonthTimeLimitException(message);
         }
 
     };

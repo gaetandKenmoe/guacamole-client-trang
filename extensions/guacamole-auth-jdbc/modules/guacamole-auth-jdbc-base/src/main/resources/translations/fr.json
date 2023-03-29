@@ -19,6 +19,8 @@
 
         "FIELD_HEADER_MAX_CONNECTIONS"          : "Nombre maximum de connexions:",
         "FIELD_HEADER_MAX_CONNECTIONS_PER_USER" : "Nombre maximum de connexions par utilisateur:",
+        "FIELD_HEADER_DAY_LIMIT"                : "Limite journalière (Minutes):",
+        "FIELD_HEADER_MONTH_LIMIT"              : "Limite Mensuele (Minutes):",
 
         "FIELD_HEADER_FAILOVER_ONLY"            : "Utilisé seulement en cas de bascule:",
         "FIELD_HEADER_WEIGHT"                   : "Poids de la connexion:",
@@ -42,6 +44,8 @@
         "FIELD_HEADER_ENABLE_SESSION_AFFINITY"  : "Activer l'affinité de session:",
         "FIELD_HEADER_MAX_CONNECTIONS"          : "Nombre maximum de connexions:",
         "FIELD_HEADER_MAX_CONNECTIONS_PER_USER" : "Nombre maximum de connexions par utilisateur:",
+        "FIELD_HEADER_DAY_LIMIT"                : "Limite journalière (Minutes):",
+        "FIELD_HEADER_MONTH_LIMIT"              : "Limite Mensuele (Minutes):",
 
         "SECTION_HEADER_CONCURRENCY" : "Limites de concurrence (Groupes de répartition)"
 
