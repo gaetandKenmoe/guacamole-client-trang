@@ -835,6 +835,8 @@
 
         "ACTION_DOWNLOAD" : "@:APP.ACTION_DOWNLOAD",
         "ACTION_SEARCH" : "@:APP.ACTION_SEARCH",
+        "ACTION_VIEW_RECORDING" : "@:APP.ACTION_VIEW_RECORDING",
+        "ACTION_DELETE"         : "Supprimer",
 
         "FIELD_PLACEHOLDER_FILTER" : "@:APP.FIELD_PLACEHOLDER_FILTER",
 
@@ -852,6 +854,7 @@
         "TABLE_HEADER_SESSION_REMOTEHOST"      : "Hôte distant",
         "TABLE_HEADER_SESSION_STARTDATE"       : "Ouvert depuis",
         "TABLE_HEADER_SESSION_USERNAME"        : "Identifiant",
+        "TABLE_HEADER_SESSION_DELETE"          : "Supprimer le fichier",
 
         "TEXT_HISTORY_DURATION" : "@:APP.TEXT_HISTORY_DURATION"
 

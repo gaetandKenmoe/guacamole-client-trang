@@ -78,6 +78,20 @@ angular.module('rest').factory('historyService', ['$injector',
         });
 
     };
+    
+    
+    service.DeleteFileConnectionHistory = function DeleteFileConnectionHistory(dataSource, identifier) {
+
+        // Retrieve connection history
+        return authenticationService.request({
+            method  : 'GET',
+            url     : 'api/session/data/' + encodeURIComponent(dataSource) + '/history/deleteFile',
+            params  : {
+                identifier: identifier
+            }
+        });
+
+    };
 
     return service;
 

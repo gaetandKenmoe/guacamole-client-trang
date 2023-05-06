@@ -105,7 +105,7 @@ angular.module('settings').factory('ConnectionHistoryEntryWrapper', ['$injector'
                 url : '#/settings/' + encodeURIComponent(dataSource)
                     + '/recording/' + encodeURIComponent(identifier)
                     + '/' + encodeURIComponent(name),
-
+            
                 description : $translate(log.description.key, log.description.variables)
 
             });
@@ -134,7 +134,7 @@ angular.module('settings').factory('ConnectionHistoryEntryWrapper', ['$injector'
          * @type {!string}
          */
         this.url = template.url;
-
+        
         /**
          * A promise that resolves with a human-readable description of the log.
          *

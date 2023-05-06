@@ -884,6 +884,7 @@
         "ACTION_DOWNLOAD"       : "@:APP.ACTION_DOWNLOAD",
         "ACTION_SEARCH"         : "@:APP.ACTION_SEARCH",
         "ACTION_VIEW_RECORDING" : "@:APP.ACTION_VIEW_RECORDING",
+        "ACTION_DELETE"         : "Delete",
 
         "FIELD_PLACEHOLDER_FILTER" : "@:APP.FIELD_PLACEHOLDER_FILTER",
 
@@ -902,6 +903,7 @@
         "TABLE_HEADER_SESSION_REMOTEHOST"      : "Remote host",
         "TABLE_HEADER_SESSION_STARTDATE"       : "Start time",
         "TABLE_HEADER_SESSION_USERNAME"        : "Username",
+        "TABLE_HEADER_SESSION_DELETE"          : "Delete file",
 
         "TEXT_HISTORY_DURATION" : "@:APP.TEXT_HISTORY_DURATION"
 

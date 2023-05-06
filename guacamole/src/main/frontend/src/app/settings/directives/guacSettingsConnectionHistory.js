@@ -261,6 +261,25 @@ angular.module('settings').directive('guacSettingsConnectionHistory', [function 
 
             };
 
+
+            /**
+             * Delete recording file.
+             *
+             * @param {!string} identifier
+             *     The identifier of the recording file.
+             */
+            $scope.deleteRecordingFile = function deleteRecordingFile(identifier) {
+                historyService.DeleteFileConnectionHistory(
+                    $scope.dataSource,
+                    identifier
+                )
+                .then(function reload() {
+
+                    $scope.search();
+
+                });
+            };
+
             // Initialize search results
             $scope.search();
             

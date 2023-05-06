@@ -35,6 +35,9 @@
                     <th>
                         {{'SETTINGS_CONNECTION_HISTORY.TABLE_HEADER_SESSION_LOGS' | translate}}
                     </th>
+                    <th>
+                        {{'SETTINGS_CONNECTION_HISTORY.TABLE_HEADER_SESSION_DELETE' | translate}}
+                    </th>
                 </tr>
             </thead>
             <tbody ng-class="{loading: !isLoaded()}">
@@ -52,6 +55,13 @@
                            ng-attr-title="{{ historyEntryWrapper.sessionRecording.description | resolve }}">
                             <span class="history-action-description">{{'SETTINGS_CONNECTION_HISTORY.ACTION_VIEW_RECORDING' | translate}}</span>
                         </a>
+                    </td>
+                    <td>
+                        <button type="button" 
+                            ng-click="deleteRecordingFile(historyEntryWrapper.entry.identifier)"
+                            ng-show="historyEntryWrapper.sessionRecording">
+                            {{'SETTINGS_CONNECTION_HISTORY.ACTION_DELETE' | translate}}
+                        </button>
                     </td>
                 </tr>
             </tbody>
